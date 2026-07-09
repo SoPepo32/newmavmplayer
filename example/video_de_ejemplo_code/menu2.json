@@ -1,0 +1,42 @@
+{
+    "type": "menu",
+    "functions": {
+
+    },
+    "start": [
+        {"menu": ["create", "menu1"]},
+        {"menu1": [{"resolution": [1920,1080]}]},
+        {"menu1": [{"image": ["create","img1", "coordinates",0,0,1920,1080, "background1.png"]}]},
+        {"menu1": [{"button": ["create","backgroundbutton1", "coordinates",100,100,700,300, "title","background2", "color",[128,128,128], "command_click",{"image":["edit","img1", "coordinates", 0,0,1920,1080, "background2.png"]}]}]},
+
+        {"menu1": [{"text": ["create","t1", "coordinates",0,0,1920,75, "text","hi :D"]}]},
+        
+        {"menu1": [{"ebook": ["create","e1", "epub_path","assets.tar:ebook1.epub", "chapter",0, "coordinates",[764,75,1920,1080]]}]},
+        {"menu1": [{"button_default": ["backgroundbutton1"]}]},
+
+        {"script": ["create", "script2"]},
+        {"script2": [{"variable": ["create","num", "content",-1]}]},
+        {"script2": [{"variable": ["edit", "num", "content", [{"script2":[{"variable":["insert_value", "num"]}]}, "-", [-1, "+", 0, "*", 0]]]}]},
+        {"script2": [{"variable": ["create","num2", "content",[]]}]},
+
+        {"script2": [{"range": ["starting_value",10, "final_value",0, "definition",-0.5, "output_variable","num2"]}]},
+
+        {"script2": [{"folder_contents": ["folder","assets.tar:video/", "output_variable","files_video"]}]},
+        {"script2": [{"for": [["temporary_variable_for_output","i", "content_list_variable","num2"],
+                            [
+                                {"menu1": [{"text": ["edit","t1", "coordinates",0,75,1920,75, "text",{"script2":[{"variable":["insert_value", "i"]}]}]}]},
+                                {"time": ["wait",1,"seconds"]}
+                            ]
+                        ]
+                    }]},
+        
+
+        {"import": ["lib1.json;video_button_lib"]},
+        {"function": ["run","video_button_lib:video_button", "scripts2extract",["script1"]]},
+
+        {"menu1": [{"text": ["create","t3", "coordinates",0,1005,764,1080, "text",{"script1":[{"variable":["insert_value", "file_video"]}]}]}]}
+    ],
+    "loop": [
+
+    ]
+}
