@@ -51,6 +51,12 @@ void drawO(SDL_Renderer* renderer, int x, int y, int s) {
     SDL_RenderDrawLine(renderer, x+5*s, y+10*s, x+5*s, y);
 }
 
+void drawU(SDL_Renderer* renderer, int x, int y, int s) {
+    SDL_RenderDrawLine(renderer, x, y, x, y+10*s);
+    SDL_RenderDrawLine(renderer, x, y+10*s, x+5*s, y+10*s);
+    SDL_RenderDrawLine(renderer, x+5*s, y+10*s, x+5*s, y);
+}
+
 void drawP(SDL_Renderer* renderer, int x, int y, int s) {
     SDL_RenderDrawLine(renderer, x, y, x, y+10*s);
     SDL_RenderDrawLine(renderer, x, y, x+5*s, y);
@@ -62,6 +68,13 @@ void drawN(SDL_Renderer* renderer, int x, int y, int s) {
     SDL_RenderDrawLine(renderer, x, y, x, y+10*s);
     SDL_RenderDrawLine(renderer, x+5*s, y, x+5*s, y+10*s);
     SDL_RenderDrawLine(renderer, x, y, x+5*s, y+10*s);
+}
+
+void drawM(SDL_Renderer* renderer, int x, int y, int s) {
+    SDL_RenderDrawLine(renderer, x, y, x, y+10*s);
+    SDL_RenderDrawLine(renderer, x, y, x+3*s, y+4*s);
+    SDL_RenderDrawLine(renderer, x+3*s, y+4*s, x+6*s, y);
+    SDL_RenderDrawLine(renderer, x+6*s, y, x+6*s, y+10*s);
 }
 
 void drawA(SDL_Renderer* renderer, int x, int y, int s) {
@@ -229,7 +242,7 @@ class menu_up {
             drawV(renderer,x+19*s,y,s);
             // E
             drawE(renderer,x+29*s,y,s);
-            // space
+            // Space
             // C
             drawC(renderer,x+45*s,y,s);
             // O
@@ -242,6 +255,42 @@ class menu_up {
             drawI(renderer,x+82*s,y,s);
             // G
             drawG(renderer,x+87*s,y,s);
+        }
+};
+
+class menu_below {
+    private:
+        int s;
+    
+    public:
+        menu_below(int scale) {
+            s = scale;
+        }
+
+        void drawLoop(SDL_Renderer* renderer, int x, int y) {
+            // L
+            drawL(renderer,x,y,s);
+            // O
+            drawO(renderer,x+7*s,y,s);
+            // O
+            drawO(renderer,x+16*s,y,s);
+            // P
+            drawP(renderer,x+25*s,y,s);
+        }
+
+        void drawVolume(SDL_Renderer* renderer, int x, int y) {
+            // V
+            drawV(renderer,x,y,s);
+            // O
+            drawO(renderer,x+10*s,y,s);
+            // L
+            drawL(renderer,x+19*s,y,s);
+            // U
+            drawU(renderer,x+26*s,y,s);
+            // M
+            drawM(renderer,x+35*s,y,s);
+            // E
+            drawE(renderer,x+45*s,y,s);
         }
 };
 
@@ -282,7 +331,7 @@ int main() {
     bool mconfig = false;
 
     menu_up MenuUp(scale);
-    
+    menu_below MenuBelow(scale);
     while (corriendo) {
         SDL_Rect rect_down = {0, 480-(20*scale+10), 640, 20*scale+10};
         SDL_Rect rect_up = {0, 0, 640, 10*scale+10};
@@ -354,6 +403,9 @@ int main() {
 
         MenuUp.drawFiles(renderer, 5,5);
         MenuUp.drawConfig(renderer, 5+std::round(36*scale+10),5);
+        
+        MenuBelow.drawLoop(renderer, 5, 460);
+        MenuBelow.drawVolume(renderer, 584, 460);
 
         if (mfiles) {
             MenuUp.menu_files(renderer);
