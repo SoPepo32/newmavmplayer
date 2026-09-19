@@ -92,6 +92,16 @@ void drawV(SDL_Renderer* renderer, int x, int y, int s) {
     SDL_RenderDrawLine(renderer, x+3*s, y+10*s*s, x+6*s, y+5*s);
 }
 
+void draw_forward_slash(SDL_Renderer* renderer, int x, int y, int s) {
+    SDL_RenderDrawLine(renderer, x+3*s, y, x, y+10*s);
+}
+
+void drawY(SDL_Renderer* renderer, int x, int y, int s) {
+    SDL_RenderDrawLine(renderer, x, y, x+3*s, y+4*s);
+    SDL_RenderDrawLine(renderer, x+6*s, y, x+3*s, y+4*s);
+    SDL_RenderDrawLine(renderer, x+3*s, y+4*s*s, x+3*s, y+10*s);
+}
+
 void drawC(SDL_Renderer* renderer, int x, int y, int s) {
     SDL_RenderDrawLine(renderer, x, y, x+6*s, y);
     SDL_RenderDrawLine(renderer, x, y, x, y+10*s);
@@ -267,7 +277,9 @@ class menu_below {
             s = scale;
         }
 
-        void drawLoop(SDL_Renderer* renderer, int x, int y) {
+        void drawLoop(SDL_Renderer* renderer, int x, int y, bool Y_N) {
+            SDL_Rect rect_a = {x-5*s, y-7*s, 58*s, 24*s};
+            SDL_RenderDrawRect(renderer, &rect_a);
             // L
             drawL(renderer,x,y,s);
             // O
@@ -276,9 +288,20 @@ class menu_below {
             drawO(renderer,x+16*s,y,s);
             // P
             drawP(renderer,x+25*s,y,s);
+
+            // Check
+            SDL_Rect rect_b = {x+34*s, y-2*s, 14*s, 14*s};
+            if (Y_N) {
+                SDL_RenderFillRect(renderer, &rect_b);
+            } else {
+                SDL_RenderDrawRect(renderer, &rect_b);
+            }
         }
 
-        void drawVolume(SDL_Renderer* renderer, int x, int y) {
+        void drawVolume(SDL_Renderer* renderer, int x, int y, int volume) {
+            SDL_Rect rect_c = {x-5*s, y-10*s, 65*s, 45*s};
+            SDL_RenderDrawRect(renderer, &rect_c);
+
             // V
             drawV(renderer,x,y,s);
             // O
@@ -291,6 +314,37 @@ class menu_below {
             drawM(renderer,x+35*s,y,s);
             // E
             drawE(renderer,x+45*s,y,s);
+
+            SDL_Rect rect_a = {x, y+15*s, 52*s, 10*s};
+            SDL_RenderDrawRect(renderer, &rect_a);
+            SDL_Rect rect_b = {x, y+15*s, volume*s, 10*s};
+            SDL_RenderFillRect(renderer, &rect_b);
+        }
+
+        void drawPlayPause(SDL_Renderer* renderer, int x, int y) {
+            SDL_Rect rect = {x-5*s, y-5*s, 99*s, 20*s};
+            SDL_RenderDrawRect(renderer, &rect);
+
+            // P
+            drawP(renderer,x,y,s);
+            // L
+            drawL(renderer,x+9*s,y,s);
+            // A
+            drawA(renderer,x+18*s,y,s);
+            // Y
+            drawY(renderer,x+28*s,y,s);
+            // /
+            draw_forward_slash(renderer,x+38*s,y,s);
+            // P
+            drawP(renderer,x+45,y,s);
+            // A
+            drawA(renderer,x+54*s,y,s);
+            // U
+            drawU(renderer,x+64*s,y,s);
+            // S
+            drawS(renderer,x+73*s,y,s);
+            // E
+            drawE(renderer,x+83*s,y,s);
         }
 };
 
@@ -327,17 +381,23 @@ int main() {
     int scale = 1;
     int i = 0;
 
+    int volume = 19; // range 0->52
+
     bool mfiles = false;
     bool mconfig = false;
+    bool Loop_Y_N = false;
 
     menu_up MenuUp(scale);
     menu_below MenuBelow(scale);
+
+
+    SDL_Rect rect_down = {0, 480-(20*scale+20), 640, 20*scale+20};
+    SDL_Rect rect_up = {0, 0, 640, 10*scale+10};
+    SDL_Rect rect_files = {0, 0, 35*scale+10, 10*scale+10};
+    SDL_Rect rect_config = {35*scale+10, 0, 35*scale+10, 10*scale+10};
+    SDL_Rect rect_loop = {0, 455-7*scale, 58*scale, 24*scale};
+
     while (corriendo) {
-        SDL_Rect rect_down = {0, 480-(20*scale+10), 640, 20*scale+10};
-        SDL_Rect rect_up = {0, 0, 640, 10*scale+10};
-        SDL_Rect rect_files = {0, 0, 35*scale+10, 10*scale+10};
-        SDL_Rect rect_config = {35*scale+10, 0, 35*scale+10, 10*scale+10};
-        
         while (SDL_PollEvent(&evento)) {
             if (evento.type == SDL_QUIT) corriendo = false;
 
@@ -345,15 +405,7 @@ int main() {
                 std::cout << "Click presionado en ("
                           << evento.button.x << ", "
                           << evento.button.y << ")" << std::endl;
-            }
-
-            if (evento.type == SDL_MOUSEBUTTONUP) {
-                std::cout << "Click liberado en ("
-                          << evento.button.x << ", "
-                          << evento.button.y << ")" << std::endl;
-            }
-
-            if (evento.type == SDL_MOUSEBUTTONDOWN) {
+                
                 int x = evento.button.x;
                 int y = evento.button.y;
 
@@ -383,6 +435,17 @@ int main() {
                     mconfig = false;
                 }
 
+                if (x >= rect_loop.x && x <= rect_loop.x + rect_loop.w &&
+                    y >= rect_loop.y && y <= rect_loop.y + rect_loop.h) {
+                    std::cout << "Click dentro de loop" << std::endl;
+                    Loop_Y_N = !Loop_Y_N;
+                }
+            }
+
+            if (evento.type == SDL_MOUSEBUTTONUP) {
+                std::cout << "Click liberado en ("
+                          << evento.button.x << ", "
+                          << evento.button.y << ")" << std::endl;
             }
         }
         // Fondo negro
@@ -404,8 +467,9 @@ int main() {
         MenuUp.drawFiles(renderer, 5,5);
         MenuUp.drawConfig(renderer, 5+std::round(36*scale+10),5);
         
-        MenuBelow.drawLoop(renderer, 5, 460);
-        MenuBelow.drawVolume(renderer, 584, 460);
+        MenuBelow.drawLoop(renderer, 5, 455, Loop_Y_N);
+        MenuBelow.drawVolume(renderer, 584, 450, volume);
+        MenuBelow.drawPlayPause(renderer, 252, 445);
 
         if (mfiles) {
             MenuUp.menu_files(renderer);
