@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
 #include <iostream>
 
 #include <vector>
@@ -346,6 +347,42 @@ class menu_below {
             // E
             drawE(renderer,x+83*s,y,s);
         }
+
+        void draw_advance(SDL_Renderer* renderer, int x, int y) {
+            SDL_Rect rect = {x-5*s, y-5*s, 20*s, 20*s};
+            SDL_RenderDrawRect(renderer, &rect);
+
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+10*s, y+5*s);
+            SDL_RenderDrawLine(renderer, x+7*s, y, x+10*s, y+5*s);
+            SDL_RenderDrawLine(renderer, x+7*s, y+10*s, x+10*s, y+5*s);
+        }
+
+        void draw_back(SDL_Renderer* renderer, int x, int y) {
+            SDL_Rect rect = {x-5*s, y-5*s, 20*s, 20*s};
+            SDL_RenderDrawRect(renderer, &rect);
+
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+10*s, y+5*s);
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+3*s, y);
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+3*s, y+10*s);
+        }
+
+        void draw_after(SDL_Renderer* renderer, int x, int y) {
+            SDL_Rect rect = {x-5*s, y-5*s, 80*s, 20*s};
+            SDL_RenderDrawRect(renderer, &rect);
+
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+70*s, y+5*s);
+            SDL_RenderDrawLine(renderer, x+67*s, y, x+70*s, y+5*s);
+            SDL_RenderDrawLine(renderer, x+67*s, y+10*s, x+70*s, y+5*s);
+        }
+
+        void draw_before(SDL_Renderer* renderer, int x, int y) {
+            SDL_Rect rect = {x-5*s, y-5*s, 80*s, 20*s};
+            SDL_RenderDrawRect(renderer, &rect);
+
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+70*s, y+5*s);
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+3*s, y);
+            SDL_RenderDrawLine(renderer, x, y+5*s, x+3*s, y+10*s);
+        }
 };
 
 bool pointInPolygon(int x, int y, const std::vector<std::pair<int,int>>& vertices) {
@@ -379,23 +416,26 @@ int main() {
     bool corriendo = true;
 
     int scale = 1;
-    int i = 0;
+    //int i = 0;
 
     int volume = 19; // range 0->52
 
     bool mfiles = false;
     bool mconfig = false;
     bool Loop_Y_N = false;
+    bool PlayPause_Y_N = true;
 
     menu_up MenuUp(scale);
     menu_below MenuBelow(scale);
 
 
-    SDL_Rect rect_down = {0, 480-(20*scale+20), 640, 20*scale+20};
     SDL_Rect rect_up = {0, 0, 640, 10*scale+10};
     SDL_Rect rect_files = {0, 0, 35*scale+10, 10*scale+10};
-    SDL_Rect rect_config = {35*scale+10, 0, 35*scale+10, 10*scale+10};
     SDL_Rect rect_loop = {0, 455-7*scale, 58*scale, 24*scale};
+    SDL_Rect rect_down = {0, 480-(20*scale+20), 640, 20*scale+20};
+    SDL_Rect rect_volume = {584, 450+15*scale, 52*scale, 10*scale};
+    SDL_Rect rect_config = {35*scale+10, 0, 35*scale+10, 10*scale+10};
+    SDL_Rect rect_pp = {252-5*scale, 445-10*scale, 65*scale, 45*scale};
 
     while (corriendo) {
         while (SDL_PollEvent(&evento)) {
@@ -440,6 +480,19 @@ int main() {
                     std::cout << "Click dentro de loop" << std::endl;
                     Loop_Y_N = !Loop_Y_N;
                 }
+
+                if (x >= rect_pp.x && x <= rect_pp.x + rect_pp.w &&
+                    y >= rect_pp.y && y <= rect_pp.y + rect_pp.h) {
+                    std::cout << "Click dentro de play/pause" << std::endl;
+                    PlayPause_Y_N = !PlayPause_Y_N;
+                }
+
+                if (x >= rect_volume.x && x <= rect_volume.x + rect_volume.w &&
+                    y >= rect_volume.y && y <= rect_volume.y + rect_volume.h) {
+                    std::cout << "Click dentro de volume" << std::endl;
+                    volume = x - rect_volume.x;
+                    std::cout << "nuevo volumen: " << volume << std::endl;
+                }
             }
 
             if (evento.type == SDL_MOUSEBUTTONUP) {
@@ -470,6 +523,10 @@ int main() {
         MenuBelow.drawLoop(renderer, 5, 455, Loop_Y_N);
         MenuBelow.drawVolume(renderer, 584, 450, volume);
         MenuBelow.drawPlayPause(renderer, 252, 445);
+        MenuBelow.draw_advance(renderer, 361, 445);
+        MenuBelow.draw_back(renderer, 222, 445);
+        MenuBelow.draw_after(renderer, 301, 465);
+        MenuBelow.draw_before(renderer, 222, 465);
 
         if (mfiles) {
             MenuUp.menu_files(renderer);
